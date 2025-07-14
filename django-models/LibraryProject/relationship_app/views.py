@@ -5,7 +5,7 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required, user_passes_test, permission_required
 from django.contrib.auth.decorators import permission_required
-
+from .models import Library 
 
 from .models import Book, Library, UserProfile
 from .forms import BookForm  # You must create this file: forms.py
