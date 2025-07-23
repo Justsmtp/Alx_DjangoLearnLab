@@ -23,9 +23,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-#vfpa#+f!mya$6fq#9^b1bqi%j^jaxtnj#78==he-)5nc@=(v6'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+
+
+# Enable browser-based protections
+SECURE_BROWSER_XSS_FILTER = True
+X_FRAME_OPTIONS = 'DENY'
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# Ensure cookies are only sent over HTTPS
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
 
 
 # Application definition
@@ -39,6 +49,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'bookshelf',
     'relationship_app',
+    'csp',
     
 
 ]
@@ -51,6 +62,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'csp.middleware.CSPMiddleware',
 ]
 
 ROOT_URLCONF = 'LibraryProject.urls'
@@ -128,3 +140,18 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
  
 AUTH_USER_MODEL = 'bookshelf.CustomUser'
 
+# Security best practices applied:
+# - Prevent XSS (SECURE_BROWSER_XSS_FILTER)
+# - Prevent Clickjacking (X_FRAME_OPTIONS)
+# - Prevent MIME-type sniffing (SECURE_CONTENT_TYPE_NOSNIFF)
+# - Enforce secure cookies (CSRF_COOKIE_SECURE & SESSION_COOKIE_SECURE)
+
+CONTENT_SECURITY_POLICY = {
+    'DIRECTIVES': {
+        'default-src': ("'self'",),
+        'script-src': ("'self'", 'https://ajax.googleapis.com'),
+        'style-src': ("'self'", 'https://fonts.googleapis.com'),
+    }
+}
+
+# CSP headers help prevent XSS by restricting sources for scripts/styles
