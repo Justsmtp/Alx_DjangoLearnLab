@@ -39,7 +39,7 @@ SESSION_COOKIE_SECURE = True
 
 
 # Instruct browsers to only use HTTPS for 1 year
-SECURE_HSTS_SECONDS =0
+SECURE_HSTS_SECONDS =31536000
 
 # Apply HSTS to all subdomains
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
