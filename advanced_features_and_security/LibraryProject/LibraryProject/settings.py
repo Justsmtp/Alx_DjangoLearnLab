@@ -38,6 +38,31 @@ CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 
 
+# Instruct browsers to only use HTTPS for 1 year
+SECURE_HSTS_SECONDS =0
+
+# Apply HSTS to all subdomains
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+
+# Allow domain to be included in browser HSTS preload list
+SECURE_HSTS_PRELOAD = True
+
+# Ensure session and CSRF cookies are sent over HTTPS only
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
+# Enable the browser's XSS protection
+SECURE_BROWSER_XSS_FILTER = True
+
+# Redirect all HTTP to HTTPS (for prod)
+SECURE_SSL_REDIRECT = True
+
+# Extra headers
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = "DENY"
+
+
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -50,6 +75,8 @@ INSTALLED_APPS = [
     'bookshelf',
     'relationship_app',
     'csp',
+    'django_extensions',
+    'sslserver',
     
 
 ]
