@@ -23,3 +23,19 @@ You can filter, search, and sort books using query parameters:
 - **Order** by fields:
   `/api/books/?ordering=title` (A–Z)
   `/api/books/?ordering=-publication_year` (Newest first)
+
+## 🧪 API Testing Strategy
+
+We used Django's built-in `unittest` framework and DRF's `APITestCase`.
+
+### Covered Scenarios:
+- Book list, create, retrieve, update, and delete
+- Filtering by title
+- Searching by keyword
+- Ordering by publication year
+- Authenticated access for create, update, delete
+
+### Running Tests:
+
+```bash
+python manage.py test api
