@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
@@ -6,6 +6,10 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .forms import UserRegisterForm, UserUpdateForm
 from .models import Post
+from .models import Post, Comment
+from .forms import CommentForm
+
+
 
 # Home page - list all posts
 class PostListView(ListView):
@@ -85,3 +89,45 @@ def profile(request):
         u_form = UserUpdateForm(instance=request.user)
 
     return render(request, 'profile.html', {'u_form': u_form})
+
+
+
+
+@login_required
+def add_comment(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.post = post
+            comment.author = request.user
+            comment.save()
+            messages.success(request, "Your comment has been added.")
+            return redirect('blog:post_detail', pk=post_id)
+    else:
+        form = CommentForm()
+    return render(request, 'blog/add_comment.html', {'form': form, 'post': post})
+
+@login_required
+def edit_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id, author=request.user)
+    if request.method == 'POST':
+        form = CommentForm(request.POST, instance=comment)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Your comment has been updated.")
+            return redirect('blog:post_detail', pk=comment.post.id)
+    else:
+        form = CommentForm(instance=comment)
+    return render(request, 'blog/edit_comment.html', {'form': form, 'comment': comment})
+
+@login_required
+def delete_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id, author=request.user)
+    if request.method == 'POST':
+        post_id = comment.post.id
+        comment.delete()
+        messages.success(request, "Your comment has been deleted.")
+        return redirect('blog:post_detail', pk=post_id)
+    return render(request, 'blog/delete_comment.html', {'comment': comment})

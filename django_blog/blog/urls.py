@@ -1,4 +1,5 @@
 # blog/urls.py
+from django import views
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from .views import (
@@ -28,4 +29,8 @@ urlpatterns = [
     path('post/new/', PostCreateView.as_view(), name='post-create'),
     path('post/<int:pk>/update/', PostUpdateView.as_view(), name='post-update'),
     path('post/<int:pk>/delete/', PostDeleteView.as_view(), name='post-delete'),
+
+    path('post/<int:post_id>/comments/new/', views.add_comment, name='add_comment'),
+    path('comments/<int:comment_id>/edit/', views.edit_comment, name='edit_comment'),
+    path('comments/<int:comment_id>/delete/', views.delete_comment, name='delete_comment'),
 ]

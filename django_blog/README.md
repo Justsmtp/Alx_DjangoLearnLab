@@ -137,6 +137,19 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 ✅ Anonymous users can view posts but cannot create, edit, or delete
 ✅ Navigation links work correctly between pages
 
+💬 Comment Functionality
+Add Comment: Logged-in users can add comments to any post from the post detail page.
+
+Edit Comment: Users can edit only their own comments.
+
+Delete Comment: Users can delete only their own comments.
+
+Visibility: All visitors can read comments, but only authenticated users can post.
+
+Permissions: Enforced using Django’s built-in user authentication and ownership checks.
+
+
+
 🖥 Running the Project
 Clone the repository
 
