@@ -4,12 +4,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from .forms import UserRegisterForm, UserUpdateForm
-from .models import Post
+from django.urls import reverse_lazy, reverse
+from .forms import UserRegisterForm, UserUpdateForm, CommentForm
 from .models import Post, Comment
-from .forms import CommentForm
-
-
 
 # Home page - list all posts
 class PostListView(ListView):
@@ -91,43 +88,53 @@ def profile(request):
     return render(request, 'profile.html', {'u_form': u_form})
 
 
+# Comment Create View
+class CommentCreateView(LoginRequiredMixin, CreateView):
+    model = Comment
+    form_class = CommentForm
+    template_name = 'blog/add_comment.html'
+
+    def form_valid(self, form):
+        post = get_object_or_404(Post, pk=self.kwargs['post_id'])
+        form.instance.post = post
+        form.instance.author = self.request.user
+        messages.success(self.request, "Your comment has been added.")
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('blog:post_detail', kwargs={'pk': self.kwargs['post_id']})
 
 
-@login_required
-def add_comment(request, post_id):
-    post = get_object_or_404(Post, id=post_id)
-    if request.method == 'POST':
-        form = CommentForm(request.POST)
-        if form.is_valid():
-            comment = form.save(commit=False)
-            comment.post = post
-            comment.author = request.user
-            comment.save()
-            messages.success(request, "Your comment has been added.")
-            return redirect('blog:post_detail', pk=post_id)
-    else:
-        form = CommentForm()
-    return render(request, 'blog/add_comment.html', {'form': form, 'post': post})
+# Comment Update View
+class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Comment
+    form_class = CommentForm
+    template_name = 'blog/edit_comment.html'
 
-@login_required
-def edit_comment(request, comment_id):
-    comment = get_object_or_404(Comment, id=comment_id, author=request.user)
-    if request.method == 'POST':
-        form = CommentForm(request.POST, instance=comment)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Your comment has been updated.")
-            return redirect('blog:post_detail', pk=comment.post.id)
-    else:
-        form = CommentForm(instance=comment)
-    return render(request, 'blog/edit_comment.html', {'form': form, 'comment': comment})
+    def form_valid(self, form):
+        messages.success(self.request, "Your comment has been updated.")
+        return super().form_valid(form)
 
-@login_required
-def delete_comment(request, comment_id):
-    comment = get_object_or_404(Comment, id=comment_id, author=request.user)
-    if request.method == 'POST':
-        post_id = comment.post.id
-        comment.delete()
-        messages.success(request, "Your comment has been deleted.")
-        return redirect('blog:post_detail', pk=post_id)
-    return render(request, 'blog/delete_comment.html', {'comment': comment})
+    def test_func(self):
+        comment = self.get_object()
+        return self.request.user == comment.author
+
+    def get_success_url(self):
+        return reverse('blog:post_detail', kwargs={'pk': self.object.post.pk})
+
+
+# Comment Delete View
+class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Comment
+    template_name = 'blog/delete_comment.html'
+
+    def test_func(self):
+        comment = self.get_object()
+        return self.request.user == comment.author
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, "Your comment has been deleted.")
+        return super().delete(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return reverse('blog:post_detail', kwargs={'pk': self.object.post.pk})
