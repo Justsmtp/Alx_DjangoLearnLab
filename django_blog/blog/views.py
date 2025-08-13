@@ -2,19 +2,63 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .forms import UserRegisterForm, UserUpdateForm
+from .models import Post
 
-from .models import Post  
-
-def home(request):
-    posts = Post.objects.all().order_by('-created_at')  # Adjust field names if different
-    return render(request, 'home.html', {'posts': posts})
-
-
-def home(request):
-    return render(request, 'home.html')
+# Home page - list all posts
+class PostListView(ListView):
+    model = Post
+    template_name = 'home.html'
+    context_object_name = 'posts'
+    ordering = ['-published_date']
 
 
+# Post details
+class PostDetailView(DetailView):
+    model = Post
+    template_name = 'post_detail.html'
+
+
+# Create new post
+class PostCreateView(LoginRequiredMixin, CreateView):
+    model = Post
+    fields = ['title', 'content']
+    template_name = 'post_form.html'
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+
+
+# Update existing post
+class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Post
+    fields = ['title', 'content']
+    template_name = 'post_form.html'
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+
+    def test_func(self):
+        post = self.get_object()
+        return self.request.user == post.author
+
+
+# Delete post
+class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Post
+    template_name = 'post_confirm_delete.html'
+    success_url = '/'
+
+    def test_func(self):
+        post = self.get_object()
+        return self.request.user == post.author
+
+
+# Register user
 def register(request):
     if request.method == 'POST':
         form = UserRegisterForm(request.POST)
@@ -27,6 +71,8 @@ def register(request):
         form = UserRegisterForm()
     return render(request, 'registration/register.html', {'form': form})
 
+
+# User profile
 @login_required
 def profile(request):
     if request.method == 'POST':
