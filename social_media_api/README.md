@@ -165,6 +165,20 @@ Authorization: Token <user_token>
 
 ✅ Search posts by title or content
 
+
+🔹 Follow & Feed API
+Follow a User
+POST /api/accounts/follow/<user_id>/
+
+Unfollow a User
+POST /api/accounts/unfollow/<user_id>/
+
+List Who You’re Following
+GET /api/accounts/following/
+
+Get Personalized Feed
+GET /api/posts/feed/
+
 ## Setup
 ```bash
 git clone https://github.com/Justsmtp/Alx_DjangoLearnLab.git
