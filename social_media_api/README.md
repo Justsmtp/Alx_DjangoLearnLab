@@ -179,6 +179,132 @@ GET /api/accounts/following/
 Get Personalized Feed
 GET /api/posts/feed/
 
+📌 Likes & Notifications Feature
+Overview
+
+This update enhances the Social Media API by adding likes and notifications functionality to improve user engagement.
+
+Users can like/unlike posts.
+
+Users receive notifications for important activities such as:
+
+Someone liking their post
+
+Gaining a new follower
+
+Receiving comments
+
+✅ Features Implemented
+1. Like Model (in posts app)
+
+Tracks which users liked which posts.
+
+Ensures a user can only like a post once.
+
+Fields:
+
+user → ForeignKey to User
+
+post → ForeignKey to Post
+
+created_at → Timestamp of like
+
+2. Notification Model (in notifications app)
+
+Stores notifications for user interactions.
+
+Fields:
+
+recipient → User receiving the notification
+
+actor → User performing the action (liking, following, commenting)
+
+verb → Short description of action (e.g., "liked your post")
+
+target → GenericForeignKey to the object (e.g., Post, Comment)
+
+timestamp → When it happened
+
+is_read → Boolean for read/unread status
+
+🔗 API Endpoints
+📍 Likes
+Method	Endpoint	Description
+POST	/posts/<int:pk>/like/	Like a post
+POST	/posts/<int:pk>/unlike/	Unlike a post
+
+Example request (authenticated user):
+
+POST /posts/5/like/
+Authorization: Bearer <token>
+
+
+Example response:
+
+{
+  "status": "success",
+  "message": "Post liked successfully."
+}
+
+📍 Notifications
+Method	Endpoint	Description
+GET	/notifications/	Retrieve all notifications for the logged-in user
+GET	/notifications/?unread=true	Retrieve unread notifications only
+
+Example response:
+
+[
+  {
+    "id": 1,
+    "actor": "john_doe",
+    "verb": "liked your post",
+    "timestamp": "2025-08-18T10:45:32Z",
+    "is_read": false
+  }
+]
+
+⚙️ How It Works
+
+Liking a Post
+
+Creates an entry in the Like model.
+
+Generates a notification for the post’s owner.
+
+Unliking a Post
+
+Deletes the entry from the Like model.
+
+No new notification is created.
+
+Notifications System
+
+Triggered when:
+
+A post is liked.
+
+A user is followed.
+
+A comment is made.
+
+Notifications are retrievable via /notifications/.
+
+Users can filter unread notifications.
+
+🧪 Testing
+
+Liking/unliking posts was tested via Postman and Django tests.
+
+Notifications were verified for:
+
+Likes
+
+Follows
+
+Comments
+
+Confirmed ordering by newest first.
+
 ## Setup
 ```bash
 git clone https://github.com/Justsmtp/Alx_DjangoLearnLab.git
