@@ -1,8 +1,43 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import generics, permissions
+from django.contrib.auth import authenticate
+from rest_framework import generics, permissions, status
 from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
+from rest_framework.views import APIView
+from rest_framework.authtoken.models import Token
+
 from .models import CustomUser
 from .serializers import UserSerializer
+
+
+class LoginView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        username = request.data.get("username")
+        password = request.data.get("password")
+
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            token, created = Token.objects.get_or_create(user=user)
+            return Response({"token": token.key, "username": user.username})
+        return Response({"error": "Invalid Credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+class RegisterView(generics.CreateAPIView):
+    queryset = CustomUser.objects.all()
+    permission_classes = [AllowAny]
+    serializer_class = UserSerializer
+
+
+# ✅ Simple profile view for the logged-in user
+class ProfileView(generics.RetrieveAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UserSerializer
+
+    def get_object(self):
+        return self.request.user
+
 
 # Follow a user
 class FollowUserView(generics.GenericAPIView):
