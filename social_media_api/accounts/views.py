@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
 
 from .models import CustomUser
-from .serializers import UserSerializer
+from .serializers import RegisterSerializer, UserSerializer
 
 # accounts/views.py
 from rest_framework.response import Response
@@ -47,7 +47,7 @@ class LoginView(APIView):
 class RegisterView(generics.CreateAPIView):
     queryset = CustomUser.objects.all()
     permission_classes = [AllowAny]
-    serializer_class = UserSerializer
+    serializer_class = RegisterSerializer
 
 
 # ✅ Simple profile view for the logged-in user
