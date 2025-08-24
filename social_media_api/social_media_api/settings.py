@@ -9,6 +9,9 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "unsafe-secret-key")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
 
+DEBUG = False
+
+
 # PythonAnywhere username must be in allowed hosts
 ALLOWED_HOSTS = ["justsmtp.pythonanywhere.com", "127.0.0.1", "localhost"]
 
