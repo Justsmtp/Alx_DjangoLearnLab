@@ -9,6 +9,26 @@ from rest_framework.authtoken.models import Token
 from .models import CustomUser
 from .serializers import UserSerializer
 
+# accounts/views.py
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from rest_framework.authtoken.models import Token
+from rest_framework import status
+from .serializers import LoginSerializer
+
+@api_view(['POST'])
+def login_view(request):
+    serializer = LoginSerializer(data=request.data)
+    if serializer.is_valid():
+        user = serializer.validated_data
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({
+            "token": token.key,
+            "username": user.username,
+            "email": user.email
+        })
+    return Response({"error": "Invalid Credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+
 
 class LoginView(APIView):
     permission_classes = [AllowAny]
