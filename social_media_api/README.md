@@ -2,6 +2,9 @@
 
 This is the first milestone of the **Social Media API**, focusing on project setup, custom user model, and authentication system.
 
+## Live API Base URL
+🌐 **Base URL**: `https://justsmtp.pythonanywhere.com`
+
 ## Features
 - Django + Django REST Framework setup
 - Custom user model with:
@@ -9,21 +12,108 @@ This is the first milestone of the **Social Media API**, focusing on project set
   - Profile picture
   - Followers/Following relationship
 - Token authentication
-- Endpoints:
-  - `/api/accounts/register/`
-  - `/api/accounts/login/`
-  - `/api/accounts/profile/`
+- CRUD operations for posts and comments
+- Like/Unlike functionality
+- Notifications system
+- User following/followers
+- Personalized feed
 
-🔹 Post Endpoints
-List Posts
+## 📋 Complete API Endpoints Reference
 
-Request
+### 🔐 Authentication Endpoints
+| Method | Endpoint | Description | Test URL |
+|--------|----------|-------------|----------|
+| POST | `/api/accounts/register/` | Register new user | `https://justsmtp.pythonanywhere.com/api/accounts/register/` |
+| POST | `/api/accounts/login/` | User login | `https://justsmtp.pythonanywhere.com/api/accounts/login/` |
+| GET | `/api/accounts/profile/` | Get user profile | `https://justsmtp.pythonanywhere.com/api/accounts/profile/` |
 
-GET /api/posts/
+### 👥 User Follow Endpoints
+| Method | Endpoint | Description | Test URL |
+|--------|----------|-------------|----------|
+| POST | `/api/accounts/follow/<user_id>/` | Follow a user | `https://justsmtp.pythonanywhere.com/api/accounts/follow/1/` |
+| POST | `/api/accounts/unfollow/<user_id>/` | Unfollow a user | `https://justsmtp.pythonanywhere.com/api/accounts/unfollow/1/` |
+| GET | `/api/accounts/following/` | List who you're following | `https://justsmtp.pythonanywhere.com/api/accounts/following/` |
 
+### 📝 Post Endpoints
+| Method | Endpoint | Description | Test URL |
+|--------|----------|-------------|----------|
+| GET | `/api/posts/` | List all posts | `https://justsmtp.pythonanywhere.com/api/posts/` |
+| POST | `/api/posts/` | Create a new post | `https://justsmtp.pythonanywhere.com/api/posts/` |
+| GET | `/api/posts/<id>/` | Retrieve specific post | `https://justsmtp.pythonanywhere.com/api/posts/1/` |
+| PUT | `/api/posts/<id>/` | Update post (author only) | `https://justsmtp.pythonanywhere.com/api/posts/1/` |
+| DELETE | `/api/posts/<id>/` | Delete post (author only) | `https://justsmtp.pythonanywhere.com/api/posts/1/` |
+| GET | `/api/posts/feed/` | Get personalized feed | `https://justsmtp.pythonanywhere.com/api/posts/feed/` |
 
-Response (200 OK)
+### 💬 Comment Endpoints
+| Method | Endpoint | Description | Test URL |
+|--------|----------|-------------|----------|
+| POST | `/api/comments/` | Create a comment | `https://justsmtp.pythonanywhere.com/api/comments/` |
+| PUT | `/api/comments/<id>/` | Update comment (author only) | `https://justsmtp.pythonanywhere.com/api/comments/1/` |
+| DELETE | `/api/comments/<id>/` | Delete comment (author only) | `https://justsmtp.pythonanywhere.com/api/comments/1/` |
 
+### ❤️ Like Endpoints
+| Method | Endpoint | Description | Test URL |
+|--------|----------|-------------|----------|
+| POST | `/api/posts/<id>/like/` | Like a post | `https://justsmtp.pythonanywhere.com/api/posts/1/like/` |
+| POST | `/api/posts/<id>/unlike/` | Unlike a post | `https://justsmtp.pythonanywhere.com/api/posts/1/unlike/` |
+
+### 🔔 Notification Endpoints
+| Method | Endpoint | Description | Test URL |
+|--------|----------|-------------|----------|
+| GET | `/api/notifications/` | Get all notifications | `https://justsmtp.pythonanywhere.com/api/notifications/` |
+| GET | `/api/notifications/?unread=true` | Get unread notifications | `https://justsmtp.pythonanywhere.com/api/notifications/?unread=true` |
+
+## 🧪 Quick Testing Guide
+
+### 1. Register a User
+```bash
+curl -X POST https://justsmtp.pythonanywhere.com/api/accounts/register/ \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "testuser",
+    "email": "test@example.com",
+    "password": "testpass123"
+  }'
+```
+
+### 2. Login
+```bash
+curl -X POST https://justsmtp.pythonanywhere.com/api/accounts/login/ \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "testuser",
+    "password": "testpass123"
+  }'
+```
+
+### 3. Create a Post (with token)
+```bash
+curl -X POST https://justsmtp.pythonanywhere.com/api/posts/ \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Token <your_token>" \
+  -d '{
+    "title": "Test Post",
+    "content": "This is a test post"
+  }'
+```
+
+### 4. List All Posts
+```bash
+curl -X GET https://justsmtp.pythonanywhere.com/api/posts/
+```
+
+## 📖 Detailed Endpoint Examples
+
+### 🔹 Post Endpoints
+
+#### List Posts
+**Request**
+```
+GET https://justsmtp.pythonanywhere.com/api/posts/
+```
+
+**Response (200 OK)**
+```json
 {
   "count": 2,
   "next": null,
@@ -38,25 +128,15 @@ Response (200 OK)
       "created_at": "2025-08-18T10:30:00Z",
       "updated_at": "2025-08-18T10:30:00Z",
       "comments": []
-    },
-    {
-      "id": 2,
-      "author": 2,
-      "author_username": "jane_smith",
-      "title": "Another Post",
-      "content": "This is another example post.",
-      "created_at": "2025-08-18T11:00:00Z",
-      "updated_at": "2025-08-18T11:00:00Z",
-      "comments": []
     }
   ]
 }
+```
 
-Create a Post
-
-Request
-
-POST /api/posts/
+#### Create a Post
+**Request**
+```
+POST https://justsmtp.pythonanywhere.com/api/posts/
 Authorization: Token <user_token>
 Content-Type: application/json
 
@@ -64,10 +144,10 @@ Content-Type: application/json
   "title": "My First Post",
   "content": "Hello, this is my first post!"
 }
+```
 
-
-Response (201 Created)
-
+**Response (201 Created)**
+```json
 {
   "id": 1,
   "author": 1,
@@ -78,43 +158,14 @@ Response (201 Created)
   "updated_at": "2025-08-18T10:30:00Z",
   "comments": []
 }
+```
 
-Retrieve a Post (with Comments)
+### 🔹 Comment Endpoints
 
-Request
-
-GET /api/posts/1/
-
-
-Response
-
-{
-  "id": 1,
-  "author": 1,
-  "author_username": "john_doe",
-  "title": "My First Post",
-  "content": "Hello, this is my first post!",
-  "created_at": "2025-08-18T10:30:00Z",
-  "updated_at": "2025-08-18T10:30:00Z",
-  "comments": [
-    {
-      "id": 1,
-      "post": 1,
-      "author": 2,
-      "author_username": "jane_smith",
-      "content": "Nice post!",
-      "created_at": "2025-08-18T10:45:00Z",
-      "updated_at": "2025-08-18T10:45:00Z"
-    }
-  ]
-}
-
-🔹 Comment Endpoints
-Create a Comment
-
-Request
-
-POST /api/comments/
+#### Create a Comment
+**Request**
+```
+POST https://justsmtp.pythonanywhere.com/api/comments/
 Authorization: Token <user_token>
 Content-Type: application/json
 
@@ -122,10 +173,10 @@ Content-Type: application/json
   "post": 1,
   "content": "Nice post!"
 }
+```
 
-
-Response (201 Created)
-
+**Response (201 Created)**
+```json
 {
   "id": 1,
   "post": 1,
@@ -135,124 +186,36 @@ Response (201 Created)
   "created_at": "2025-08-18T10:45:00Z",
   "updated_at": "2025-08-18T10:45:00Z"
 }
+```
 
-Update or Delete a Comment (Author Only)
+### 🔹 Like Endpoints
 
-Update Request
-
-PUT /api/comments/1/
+#### Like a Post
+**Request**
+```
+POST https://justsmtp.pythonanywhere.com/api/posts/1/like/
 Authorization: Token <user_token>
-Content-Type: application/json
+```
 
-{
-  "post": 1,
-  "content": "Updated comment text"
-}
-
-
-Delete Request
-
-DELETE /api/comments/1/
-Authorization: Token <user_token>
-
-🔹 Features Implemented
-
-✅ CRUD for posts and comments
-
-✅ Authors can only edit/delete their own content
-
-✅ Pagination for listing endpoints (PAGE_SIZE=10)
-
-✅ Search posts by title or content
-
-
-🔹 Follow & Feed API
-Follow a User
-POST /api/accounts/follow/<user_id>/
-
-Unfollow a User
-POST /api/accounts/unfollow/<user_id>/
-
-List Who You’re Following
-GET /api/accounts/following/
-
-Get Personalized Feed
-GET /api/posts/feed/
-
-📌 Likes & Notifications Feature
-Overview
-
-This update enhances the Social Media API by adding likes and notifications functionality to improve user engagement.
-
-Users can like/unlike posts.
-
-Users receive notifications for important activities such as:
-
-Someone liking their post
-
-Gaining a new follower
-
-Receiving comments
-
-✅ Features Implemented
-1. Like Model (in posts app)
-
-Tracks which users liked which posts.
-
-Ensures a user can only like a post once.
-
-Fields:
-
-user → ForeignKey to User
-
-post → ForeignKey to Post
-
-created_at → Timestamp of like
-
-2. Notification Model (in notifications app)
-
-Stores notifications for user interactions.
-
-Fields:
-
-recipient → User receiving the notification
-
-actor → User performing the action (liking, following, commenting)
-
-verb → Short description of action (e.g., "liked your post")
-
-target → GenericForeignKey to the object (e.g., Post, Comment)
-
-timestamp → When it happened
-
-is_read → Boolean for read/unread status
-
-🔗 API Endpoints
-📍 Likes
-Method	Endpoint	Description
-POST	/posts/<int:pk>/like/	Like a post
-POST	/posts/<int:pk>/unlike/	Unlike a post
-
-Example request (authenticated user):
-
-POST /posts/5/like/
-Authorization: Bearer <token>
-
-
-Example response:
-
+**Response**
+```json
 {
   "status": "success",
   "message": "Post liked successfully."
 }
+```
 
-📍 Notifications
-Method	Endpoint	Description
-GET	/notifications/	Retrieve all notifications for the logged-in user
-GET	/notifications/?unread=true	Retrieve unread notifications only
+### 🔹 Notification Endpoints
 
-Example response:
+#### Get Notifications
+**Request**
+```
+GET https://justsmtp.pythonanywhere.com/api/notifications/
+Authorization: Token <user_token>
+```
 
+**Response**
+```json
 [
   {
     "id": 1,
@@ -262,53 +225,37 @@ Example response:
     "is_read": false
   }
 ]
+```
 
-⚙️ How It Works
+## ✅ Features Implemented
 
-Liking a Post
+✅ CRUD for posts and comments  
+✅ Authors can only edit/delete their own content  
+✅ Pagination for listing endpoints (PAGE_SIZE=10)  
+✅ Search posts by title or content  
+✅ Like/Unlike functionality  
+✅ User follow/unfollow system  
+✅ Personalized feed based on followed users  
+✅ Real-time notifications for user interactions  
+✅ Token-based authentication  
 
-Creates an entry in the Like model.
-
-Generates a notification for the post’s owner.
-
-Unliking a Post
-
-Deletes the entry from the Like model.
-
-No new notification is created.
-
-Notifications System
-
-Triggered when:
-
-A post is liked.
-
-A user is followed.
-
-A comment is made.
-
-Notifications are retrievable via /notifications/.
-
-Users can filter unread notifications.
-
-🧪 Testing
-
-Liking/unliking posts was tested via Postman and Django tests.
-
-Notifications were verified for:
-
-Likes
-
-Follows
-
-Comments
-
-Confirmed ordering by newest first.
-
-## Setup
+## 🔧 Local Setup (Optional)
 ```bash
 git clone https://github.com/Justsmtp/Alx_DjangoLearnLab.git
 cd Alx_DjangoLearnLab/social_media_api
 pip install -r requirements.txt
 python manage.py migrate
 python manage.py runserver
+```
+
+## 📱 Testing Tools
+- **Postman**: Import the endpoint URLs for easy testing
+- **cURL**: Use the provided cURL examples
+- **Browser**: Visit GET endpoints directly in your browser
+- **Django REST Framework**: Visit endpoints with `/` at the end for browsable API
+
+## 🔑 Authentication Notes
+- Most endpoints require authentication using Token authentication
+- Include `Authorization: Token <your_token>` in request headers
+- Obtain token by logging in via `/api/accounts/login/`
+- Users can only modify their own posts and comments
